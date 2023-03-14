@@ -1,6 +1,5 @@
 package com.ll.basic1;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -52,8 +51,8 @@ public class HomeController {
 
     @GetMapping("/people")
     @ResponseBody
-    public Person[] getPeople() throws JsonProcessingException {
-        return persons.toArray(Person[]::new);
+    public ArrayList<Person> getPeople(){
+        return persons;
     }
 
     @NoArgsConstructor
