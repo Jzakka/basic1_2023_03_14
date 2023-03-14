@@ -7,6 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/home")
@@ -14,7 +16,7 @@ public class HomeController {
     private static int count = 0;
     private static int id = 1;
 
-    private static ArrayList<Person> persons = new ArrayList<>();
+    private static List<Person> persons = new ArrayList<>();
 
     @GetMapping("/main2")
     @ResponseBody
@@ -49,9 +51,16 @@ public class HomeController {
         return String.format("%d번 사람이 추가되었습니다.", id++);
     }
 
+    @GetMapping("/removePerson")
+    @ResponseBody
+    public String getPeople(@RequestParam int id){
+        persons = persons.stream().filter(p -> p.id != id).collect(Collectors.toList());
+        return String.format("%d번 사람이 삭제되었습니다.", id);
+    }
+
     @GetMapping("/people")
     @ResponseBody
-    public ArrayList<Person> getPeople(){
+    public List<Person> getPeople(){
         return persons;
     }
 
