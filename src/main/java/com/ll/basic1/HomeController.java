@@ -3,6 +3,7 @@ package com.ll.basic1;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,6 +57,16 @@ public class HomeController {
         if (persons.containsKey(id)) {
             persons.remove(id);
             return String.format("%d번 사람이 삭제되었습니다.", id);
+        }
+        return String.format("%d번 사람이 존재하지 않습니다.", id);
+    }
+
+    @GetMapping("/modifyPerson")
+    @ResponseBody
+    public String modifyPerson(@RequestParam int id, @RequestParam String name, @RequestParam int age){
+        if (persons.containsKey(id)) {
+            persons.put(id, new Person(id,name,age));
+            return String.format("%d번 사람이 수정되었습니다.", id);
         }
         return String.format("%d번 사람이 존재하지 않습니다.", id);
     }
