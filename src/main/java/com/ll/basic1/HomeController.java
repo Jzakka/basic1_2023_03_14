@@ -52,7 +52,7 @@ public class HomeController {
 
     @GetMapping("/removePerson")
     @ResponseBody
-    public String getPeople(@RequestParam int id){
+    public String removePerson(@RequestParam int id){
         if (persons.containsKey(id)) {
             persons.remove(id);
             return String.format("%d번 사람이 삭제되었습니다.", id);
