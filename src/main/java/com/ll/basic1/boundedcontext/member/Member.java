@@ -1,4 +1,4 @@
-package com.ll.basic1;
+package com.ll.basic1.boundedcontext.member;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,16 +7,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class Person{
+public class Member{
     int id;
     String name;
-    int age;
+    String password;
 
     private static int lastId = 0;
 
-    public Person(String name, int age) {
+    public Member(String name, String password) {
         this.id = ++lastId;
         this.name = name;
-        this.age = age;
+        this.password = password;
     }
 }
