@@ -21,21 +21,22 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/login")
-    public RsData login(HttpServletResponse rs, String username, String password) {
+    public RsData login(HttpServletResponse res, String username, String password) {
+        Rq rq = new Rq(null, res);
         if (username == null || password == null) {
             return RsData.result("F-3", "Username 과 password를 입력해주세요.");
         }
 
         RsData rsData = memberService.tryLogin(username, password);
         if (rsData.isSuccess()) {
-            rs.addCookie(new Cookie("user", rsData.getData().toString()));
+            rq.setCookie("user", rsData.getData().toString());
         }
 
         return rsData;
     }
 
     @GetMapping("/logout")
-    public RsData login(HttpServletRequest req, HttpServletResponse res) {
+    public RsData logout(HttpServletRequest req, HttpServletResponse res) {
         Rq rq = new Rq(req, res);
         rq.removeCookie("user");
 
