@@ -16,7 +16,7 @@ public class Rq {
         res.addCookie(new Cookie(key, value));
     }
 
-    public void setCookie(String key, int value) {
+    public void setCookie(String key, long value) {
         res.addCookie(new Cookie(key, String.valueOf(value)));
     }
 
