@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 public class Member{
-    int id;
-    String name;
-    String password;
+    private int id;
+    private String name;
+    private String password;
 
     private static int lastId = 0;
 
