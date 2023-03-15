@@ -4,8 +4,6 @@ import com.ll.basic1.common.RsData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-
 @RequiredArgsConstructor
 @Service
 public class MemberService {
@@ -14,7 +12,7 @@ public class MemberService {
 
     public RsData login(String username, String password){
         RsData res;
-        Member findMember = memberRepository.findOne(username);
+        Member findMember = memberRepository.findByUsername(username);
 
         if (findMember == null) {
             res = RsData.result("F-2", String.format("%s는 존재하지 않는 회원입니다.", username));

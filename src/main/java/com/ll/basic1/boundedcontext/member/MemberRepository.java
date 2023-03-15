@@ -21,7 +21,7 @@ public class MemberRepository {
         members.add(new Member("peace", "123413"));
     }
 
-    public Member findOne(String username){
+    public Member findByUsername(String username){
         return members
                 .stream()
                 .filter(member -> member.getName().equals(username))

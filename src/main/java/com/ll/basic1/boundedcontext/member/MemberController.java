@@ -16,6 +16,10 @@ public class MemberController {
 
     @GetMapping("/login")
     public RsData login(String username, String password){
+        if (username == null || password == null) {
+            return RsData.result("F-3", "Username 과 password를 잉ㅂ력해주세요.");
+        }
+
         return memberService.login(username, password);
     }
 }
