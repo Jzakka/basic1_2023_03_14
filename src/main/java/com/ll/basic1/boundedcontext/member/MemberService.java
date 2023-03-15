@@ -43,7 +43,7 @@ public class MemberService {
                 .filter(cookie -> cookie.getName().equals("user"))
                 .findFirst();
         return user
-                .map(cookie -> RsData.result("S-1", String.format("당신의 username은 %s입니다.", cookie.getName())))
+                .map(cookie -> RsData.result("S-1", String.format("당신의 username은 %s입니다.", cookie.getValue())))
                 .orElse(null);
     }
 }
