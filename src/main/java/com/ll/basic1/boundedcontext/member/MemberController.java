@@ -1,5 +1,6 @@
 package com.ll.basic1.boundedcontext.member;
 
+import com.ll.basic1.common.Rq;
 import com.ll.basic1.common.RsData;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +23,7 @@ public class MemberController {
     @GetMapping("/login")
     public RsData login(HttpServletResponse rs, String username, String password) {
         if (username == null || password == null) {
-            return RsData.result("F-3", "Username 과 password를 입력력해주세요.");
+            return RsData.result("F-3", "Username 과 password를 입력해주세요.");
         }
 
         RsData rsData = memberService.tryLogin(username, password);
@@ -34,24 +35,22 @@ public class MemberController {
     }
 
     @GetMapping("/logout")
-    public RsData login(HttpServletRequest rq, HttpServletResponse rs) {
-        Arrays
-                .stream(rq.getCookies())
-                .filter(cookie -> cookie.getName().equals("user"))
-                .forEach(cookie -> {
-                    cookie.setMaxAge(0);
-                    rs.addCookie(cookie);
-                });
+    public RsData login(HttpServletRequest req, HttpServletResponse res) {
+        Rq rq = new Rq(req, res);
+        rq.removeCookie("user");
+
         return RsData.result("S-1", "로그아웃 되었습니다.");
     }
 
     @GetMapping("/me")
-    public RsData me(HttpServletRequest rq) {
-        Cookie[] cookies = rq.getCookies();
-        if (cookies == null) {
-            return RsData.result("F-1", "로그인 후 이영해주세요");
+    public RsData me(HttpServletRequest req) {
+        Rq rq = new Rq(req, null);
+        String username = rq.getCookie("user", "anonymous");
+
+        if (username.equals("anonymous")) {
+            return RsData.result("F-1", "로그인 후 이용해주세요");
         }
 
-        return memberService.getUser(cookies);
+        return RsData.result("S-1", String.format("당신의 username은 %s입니다.", username));
     }
 }

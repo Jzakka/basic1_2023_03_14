@@ -32,13 +32,4 @@ public class MemberService {
 
         return res;
     }
-
-    public RsData getUser(Cookie[] cookies) {
-        Optional<Cookie> user = Arrays.stream(cookies)
-                .filter(cookie -> cookie.getName().equals("user"))
-                .findFirst();
-        return user
-                .map(cookie -> RsData.result("S-1", String.format("당신의 username은 %s입니다.", cookie.getValue())))
-                .orElse(null);
-    }
 }
