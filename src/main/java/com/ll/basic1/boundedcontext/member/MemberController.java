@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -29,6 +31,18 @@ public class MemberController {
         }
 
         return rsData;
+    }
+
+    @GetMapping("/logout")
+    public RsData login(HttpServletRequest rq, HttpServletResponse rs) {
+        Arrays
+                .stream(rq.getCookies())
+                .filter(cookie -> cookie.getName().equals("user"))
+                .forEach(cookie -> {
+                    cookie.setMaxAge(0);
+                    rs.addCookie(cookie);
+                });
+        return RsData.result("S-1", "로그아웃 되었습니다.");
     }
 
     @GetMapping("/me")
