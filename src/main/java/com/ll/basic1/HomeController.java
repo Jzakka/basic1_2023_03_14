@@ -1,21 +1,20 @@
 package com.ll.basic1;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping("/home")
 public class HomeController {
     private static int count = 0;
-    private static int id = 1;
     private static Map<Integer, Person> persons = new HashMap<>();
 
     @GetMapping("/main2")
@@ -47,8 +46,9 @@ public class HomeController {
     @GetMapping("/addPerson")
     @ResponseBody
     public String addPerson(String name, int age){
-        persons.put(id, new Person(id, name, age));
-        return String.format("%d번 사람이 추가되었습니다.", id++);
+        Person person = new Person(name, age);
+        persons.put(person.id, person);
+        return String.format("%d번 사람이 추가되었습니다.", person.id);
     }
 
     @GetMapping("/removePerson")
@@ -77,12 +77,23 @@ public class HomeController {
         return persons.values().stream().toList();
     }
 
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Getter
-    class Person{
-        int id;
-        String name;
-        int age;
+    @GetMapping("/cookies/increase")
+    @ResponseBody
+    public int cookieIncrease(HttpServletRequest req, HttpServletResponse res) {
+        Cookie[] cookies = req.getCookies();
+        if (cookies == null) {
+            res.addCookie(new Cookie("count", "0"));
+            return 0;
+        }
+
+        Integer count = Arrays
+                .stream(cookies)
+                .filter(c -> c.getName().equals("count"))
+                .map(Cookie::getValue)
+                .mapToInt(Integer::valueOf)
+                .findFirst()
+                .orElse(0);
+        res.addCookie(new Cookie("count", String.valueOf(count+1)));
+        return count + 1;
     }
 }
