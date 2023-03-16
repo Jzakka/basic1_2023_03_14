@@ -2,8 +2,6 @@ package com.ll.basic1.boundedcontext.member;
 
 import com.ll.basic1.common.Rq;
 import com.ll.basic1.common.RsData;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,10 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
 
     private final MemberService memberService;
+    private final Rq rq;
 
     @GetMapping("/login")
-    public RsData login(HttpServletResponse res, String username, String password) {
-        Rq rq = new Rq(null, res);
+    public RsData login(String username, String password) {
         if (username == null || password == null) {
             return RsData.result("F-3", "Username 과 password를 입력해주세요.");
         }
@@ -32,8 +30,7 @@ public class MemberController {
     }
 
     @GetMapping("/logout")
-    public RsData logout(HttpServletRequest req, HttpServletResponse res) {
-        Rq rq = new Rq(req, res);
+    public RsData logout() {
         boolean removed = rq.removeCookie("user");
 
         if (removed) {
@@ -43,8 +40,7 @@ public class MemberController {
     }
 
     @GetMapping("/me")
-    public RsData me(HttpServletRequest req) {
-        Rq rq = new Rq(req, null);
+    public RsData me() {
         String username = rq.getCookie("user", "anonymous");
 
         if (username.equals("anonymous")) {
