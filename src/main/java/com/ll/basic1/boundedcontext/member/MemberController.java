@@ -23,7 +23,7 @@ public class MemberController {
 
         RsData rsData = memberService.tryLogin(username, password);
         if (rsData.isSuccess()) {
-            rq.setCookie("user", rsData.getData().toString());
+            rq.setSession("user", username);
         }
 
         return rsData;
@@ -31,7 +31,7 @@ public class MemberController {
 
     @GetMapping("/logout")
     public RsData logout() {
-        boolean removed = rq.removeCookie("user");
+        boolean removed = rq.removeSession("user");
 
         if (removed) {
             return RsData.result("S-1", "로그아웃 되었습니다.");
@@ -41,7 +41,7 @@ public class MemberController {
 
     @GetMapping("/me")
     public RsData me() {
-        String username = rq.getCookie("user", "anonymous");
+        String username = rq.getSession("user", "anonymous");
 
         if (username.equals("anonymous")) {
             return RsData.result("F-1", "로그인 후 이용해주세요");
