@@ -2,16 +2,12 @@ package com.ll.basic1.boundedcontext.member;
 
 import com.ll.basic1.common.Rq;
 import com.ll.basic1.common.RsData;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Arrays;
-
 
 @RestController
 @RequiredArgsConstructor
@@ -38,9 +34,12 @@ public class MemberController {
     @GetMapping("/logout")
     public RsData logout(HttpServletRequest req, HttpServletResponse res) {
         Rq rq = new Rq(req, res);
-        rq.removeCookie("user");
+        boolean removed = rq.removeCookie("user");
 
-        return RsData.result("S-1", "로그아웃 되었습니다.");
+        if (removed) {
+            return RsData.result("S-1", "로그아웃 되었습니다.");
+        }
+        return RsData.result("F-1", "이미 로그아웃 상태입니다.");
     }
 
     @GetMapping("/me")

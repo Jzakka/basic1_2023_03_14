@@ -48,10 +48,10 @@ public class Rq {
                 .orElse(0);
     }
 
-    public void removeCookie(String key) {
+    public boolean removeCookie(String key) {
         Cookie[] cookies = req.getCookies();
         if (cookies == null) {
-            return;
+            return false;
         }
 
         Arrays
@@ -61,5 +61,6 @@ public class Rq {
                     cookie.setMaxAge(0);
                     res.addCookie(cookie);
                 });
+        return true;
     }
 }
