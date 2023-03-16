@@ -122,4 +122,14 @@ public class Rq {
         session.removeAttribute(name);
         return true;
     }
+
+    public boolean isLoggedIn() {
+        String name = getSession("user", "anonymous");
+
+        return !name.equals("anonymous");
+    }
+
+    public boolean isLoggedOut() {
+        return !isLoggedIn();
+    }
 }
