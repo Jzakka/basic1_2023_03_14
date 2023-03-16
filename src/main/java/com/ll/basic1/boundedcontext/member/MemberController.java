@@ -3,11 +3,10 @@ package com.ll.basic1.boundedcontext.member;
 import com.ll.basic1.common.Rq;
 import com.ll.basic1.common.RsData;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 @RequestMapping("/member")
 public class MemberController {
@@ -17,25 +16,11 @@ public class MemberController {
 
     @GetMapping("/login")
     public String showLogin() {
-        if (rq.isLoggedIn()) {
-            return """
-                    <h1>이미 로그인 하셨습니다.</h1>
-                    """.stripIndent();
-        }
-
-        return """
-                <!-- login -->
-                         <h2>localhost</h2>
-                         <form method="GET" action="http://localhost:8080/member/doLogin"
-                               target="_blank">
-                           <input type="text" name="username" placeholder="아이디">
-                           <input type="text" name="password" placeholder="비밀번호">
-                             <button type="submit">LOGIN</button>
-                          </form>
-                """.stripIndent();
+        return "usr/member/login";
     }
 
-    @GetMapping("/doLogin")
+    @PostMapping("/login")
+    @ResponseBody
     public RsData login(String username, String password) {
         if (username == null || password == null) {
             return RsData.result("F-3", "Username 과 password를 입력해주세요.");
@@ -50,6 +35,7 @@ public class MemberController {
     }
 
     @GetMapping("/logout")
+    @ResponseBody
     public RsData logout() {
         boolean removed = rq.removeSession("user");
 
@@ -60,6 +46,7 @@ public class MemberController {
     }
 
     @GetMapping("/me")
+    @ResponseBody
     public RsData me() {
         String username = rq.getSession("user", "anonymous");
 
