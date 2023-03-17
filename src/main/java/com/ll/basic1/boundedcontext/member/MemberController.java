@@ -2,58 +2,72 @@ package com.ll.basic1.boundedcontext.member;
 
 import com.ll.basic1.common.Rq;
 import com.ll.basic1.common.RsData;
-import lombok.RequiredArgsConstructor;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 
 @Controller
-@RequiredArgsConstructor
-@RequestMapping("/member")
+@AllArgsConstructor
 public class MemberController {
-
     private final MemberService memberService;
     private final Rq rq;
 
-    @GetMapping("/login")
+    @GetMapping("/member/login")
     public String showLogin() {
         return "usr/member/login";
     }
 
-    @PostMapping("/login")
+    @PostMapping("/member/login")
     @ResponseBody
     public RsData login(String username, String password) {
-        if (username == null || password == null) {
-            return RsData.result("F-3", "Username 과 password를 입력해주세요.");
+        if (username == null || username.trim().length() == 0) {
+            return RsData.result("F-3", "username(을)를 입력해주세요.");
+        }
+
+        if (password == null || password.trim().length() == 0) {
+            return RsData.result("F-4", "password(을)를 입력해주세요.");
         }
 
         RsData rsData = memberService.tryLogin(username, password);
+
         if (rsData.isSuccess()) {
-            rq.setSession("user", username);
+            Member member = (Member) rsData.getData();
+            rq.setSession("loginedMemberId", member.getId());
         }
 
         return rsData;
     }
 
-    @GetMapping("/logout")
+    @GetMapping("/member/logout")
     @ResponseBody
     public RsData logout() {
-        boolean removed = rq.removeSession("user");
+        boolean cookieRemoved = rq.removeSession("loginedMemberId");
 
-        if (removed) {
-            return RsData.result("S-1", "로그아웃 되었습니다.");
+        if (cookieRemoved == false) {
+            return RsData.result("S-2", "이미 로그아웃 상태입니다.");
         }
-        return RsData.result("F-1", "이미 로그아웃 상태입니다.");
+
+        return RsData.result("S-1", "로그아웃 되었습니다.");
     }
 
-    @GetMapping("/me")
+    @GetMapping("/member/me")
+    public String showMe(Model model) {
+        long loggedInId = rq.getSessionAsLong("loginedMemberId", 0);
+        Member member = memberService.findById(loggedInId);
+        model.addAttribute("member", member);
+
+        return "usr/member/me";
+    }
+
+    // 디버깅용 함수
+    @GetMapping("/member/session")
     @ResponseBody
-    public RsData me() {
-        String username = rq.getSession("user", "anonymous");
-
-        if (username.equals("anonymous")) {
-            return RsData.result("F-1", "로그인 후 이용해주세요");
-        }
-
-        return RsData.result("S-1", String.format("당신의 username은 %s입니다.", username));
+    public String showSession() {
+        return rq.getSessionDebugContents().replaceAll("\n", "<br>");
     }
 }

@@ -9,103 +9,83 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 import java.util.Arrays;
+import java.util.Enumeration;
 
 @Component
 @RequestScope
 @AllArgsConstructor
 public class Rq {
-    HttpServletRequest req;
-    HttpServletResponse res;
+    private final HttpServletRequest req;
+    private final HttpServletResponse resp;
 
-    public void setCookie(String key, String value) {
-        res.addCookie(new Cookie(key, value));
-    }
+    public boolean removeCookie(String name) {
+        if (req.getCookies() != null) {
+            Cookie cookie = Arrays.stream(req.getCookies())
+                    .filter(c -> c.getName().equals(name))
+                    .findFirst()
+                    .orElse(null);
 
-    public void setCookie(String key, long value) {
-        res.addCookie(new Cookie(key, String.valueOf(value)));
-    }
+            if (cookie != null) {
+                cookie.setMaxAge(0);
+                resp.addCookie(cookie);
 
-    public String getCookie(String key, String defaultValue){
-        Cookie[] cookies = req.getCookies();
-        if (cookies == null) {
-            return defaultValue;
+                return true;
+            }
         }
 
-        return Arrays
-                .stream(req.getCookies())
-                .filter(cookie -> cookie.getName().equals(key))
+        return false;
+    }
+
+    public String getCookie(String name, String defaultValue) {
+        if (req.getCookies() == null) return defaultValue;
+
+        return Arrays.stream(req.getCookies())
+                .filter(cookie -> cookie.getName().equals(name))
                 .map(Cookie::getValue)
                 .findFirst()
                 .orElse(defaultValue);
     }
 
-    public Long getCookieAsLong(String key, Long defaultValue) {
-        Cookie[] cookies = req.getCookies();
-        if (cookies == null) {
-            return defaultValue;
-        }
-
-        return Arrays
-                .stream(req.getCookies())
-                .filter(cookie -> cookie.getName().equals(key))
-                .mapToLong(cookie -> Long.parseLong(cookie.getValue()))
-                .findFirst()
-                .orElse(0);
-    }
-
-    public boolean removeCookie(String key) {
-        Cookie[] cookies = req.getCookies();
-        if (cookies == null) {
-            return false;
-        }
-
-        Arrays
-                .stream(cookies)
-                .filter(cookie -> cookie.getName().equals(key))
-                .forEach(cookie -> {
-                    cookie.setMaxAge(0);
-                    res.addCookie(cookie);
-                });
-        return true;
-    }
-
-    public void setSession(String name, String value) {
-        HttpSession session = req.getSession();
-        session.setAttribute(name, value);
-    }
-
-    public String getSession(String name, String defaultValue) {
-        String value = getSessionAsStr(name, null);
+    public long getCookieAsLong(String name, long defaultValue) {
+        String value = getCookie(name, null);
 
         if (value == null) {
             return defaultValue;
         }
 
         try {
-            return value;
+            return Long.parseLong(value);
         } catch (NumberFormatException e) {
             return defaultValue;
         }
     }
 
-    private String getSessionAsStr(String name,String defaultValue) {
+    public void setCookie(String name, long value) {
+        setCookie(name, value + "");
+    }
+
+    public void setCookie(String name, String value) {
+        resp.addCookie(new Cookie(name, value));
+    }
+
+    public void setSession(String name, long value) {
+        HttpSession session = req.getSession();
+        session.setAttribute(name, value);
+    }
+
+    public long getSessionAsLong(String name, long defaultValue) {
         try {
-            String value = (String) req.getSession().getAttribute(name);
-            if (value == null) {
-                return defaultValue;
-            }
+            long value = (long) req.getSession().getAttribute(name);
             return value;
         } catch (Exception e) {
             return defaultValue;
         }
     }
 
-    private long getSessionAsLong(String name,long defaultValue) {
+    private String getSessionAsStr(String name, String defaultValue) {
         try {
-            Long value = (Long) req.getSession().getAttribute(name);
-            if (value == null) {
-                return defaultValue;
-            }
+            String value = (String) req.getSession().getAttribute(name);
+            if (value == null) return defaultValue;
             return value;
         } catch (Exception e) {
             return defaultValue;
@@ -115,21 +95,34 @@ public class Rq {
     public boolean removeSession(String name) {
         HttpSession session = req.getSession();
 
-        if (session.getAttribute(name) == null) {
-            return false;
-        }
+        if (session.getAttribute(name) == null) return false;
 
         session.removeAttribute(name);
         return true;
     }
 
-    public boolean isLoggedIn() {
-        String name = getSession("user", "anonymous");
+    // 디버깅용 함수
+    public String getSessionDebugContents() {
+        HttpSession session = req.getSession();
+        StringBuilder sb = new StringBuilder("Session content:\n");
 
-        return !name.equals("anonymous");
+        Enumeration<String> attributeNames = session.getAttributeNames();
+        while (attributeNames.hasMoreElements()) {
+            String attributeName = attributeNames.nextElement();
+            Object attributeValue = session.getAttribute(attributeName);
+            sb.append(String.format("%s: %s\n", attributeName, attributeValue));
+        }
+
+        return sb.toString();
     }
 
-    public boolean isLoggedOut() {
-        return !isLoggedIn();
+    public boolean isLogined() {
+        long loginedMemberId = getSessionAsLong("loginedMemberId", 0);
+
+        return loginedMemberId > 0;
+    }
+
+    public boolean isLogout() {
+        return !isLogined();
     }
 }
