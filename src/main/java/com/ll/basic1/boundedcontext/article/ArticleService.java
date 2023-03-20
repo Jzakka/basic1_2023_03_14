@@ -14,9 +14,8 @@ public class ArticleService {
 
 
     public Article write(String title, String body) {
-        Article article = Article.builder()
-                .createDate(LocalDateTime.now())
-                .modifyDate(LocalDateTime.now())
+        Article article = Article
+                .builder()
                 .title(title)
                 .body(body)
                 .build();
